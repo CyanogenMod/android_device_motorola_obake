@@ -35,9 +35,16 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     lights.msm8960
 
+# Ramdisk
+PRODUCT_PACKAGES += \
+    init.target.rc \
+    init.obake.sh
+
 # Thermal
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/thermald-msm8960dt.conf:system/etc/thermald-msm8960dt.conf
+    $(LOCAL_PATH)/configs/thermald-obake.conf:system/etc/thermald-obake.conf \
+    $(LOCAL_PATH)/configs/thermald-obakem.conf:system/etc/thermald-obakem.conf \
+    $(LOCAL_PATH)/configs/thermald-obake-maxx.conf:system/etc/thermald-obake-maxx.conf
 
 # WiFi
 PRODUCT_PACKAGES += \

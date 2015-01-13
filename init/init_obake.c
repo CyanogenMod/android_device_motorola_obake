@@ -92,15 +92,18 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
     if (ISMATCH(bootdevice, "obakem")) {
         /* xt1030 - obakem */
         property_set("ro.product.device", "obakem");
+        property_set("ro.build.product", "obakem");
         property_set("ro.product.model", "DROID Mini");
         property_set("ro.audio.init", "obakem");
     } else if (ISMATCH(bootdevice, "obake")) {
         /* xt1080 - obake */
         property_set("ro.product.device", "obake");
+        property_set("ro.build.product", "obake");
         property_set("ro.product.model", "DROID Ultra");
     } else if (ISMATCH(bootdevice, "obake-maxx")) {
         /* xt1080m - obake-maxx */
         property_set("ro.product.device", "obake-maxx");
+        property_set("ro.build.product", "obake-maxx");
         property_set("ro.product.model", "DROID MAXX");
         property_set("ro.audio.init", "obake-maxx");
     }

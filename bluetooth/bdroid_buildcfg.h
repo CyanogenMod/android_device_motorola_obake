@@ -17,7 +17,25 @@
 #ifndef _BDROID_BUILDCFG_H
 #define _BDROID_BUILDCFG_H
 
-#define BTM_DEF_LOCAL_NAME "" /* Let it read from the property */
+#include <cutils/properties.h>
+#include <string.h>
+
+inline const char* BtmGetDefaultName()
+{
+	char device[PROPERTY_VALUE_MAX];
+	property_get("ro.boot.device", device, "");
+
+	if (!strcmp("obakem", device))
+		return "Motorola DROID Mini";
+	if (!strcmp("obake", device))
+		return "Motorola DROID Ultra";
+	if (!strcmp("obake-maxx", device))
+		return "Motorola DROID MAXX";
+
+	return "";
+}
+
+#define BTM_DEF_LOCAL_NAME BtmGetDefaultName()
 #define BTA_DISABLE_DELAY 1000 /* in milliseconds */
 #define BLUETOOTH_QCOM_SW TRUE
 #define BLUETOOTH_QCOM_LE_INTL_SCAN TRUE

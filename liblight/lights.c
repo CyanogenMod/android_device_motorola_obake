@@ -36,6 +36,8 @@
 
 static pthread_once_t g_init = PTHREAD_ONCE_INIT;
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
+static struct light_state_t g_notification;
+static struct light_state_t g_battery;
 static int g_lcd_brightness = 0;
 static int g_button_on = 0;
 
@@ -44,6 +46,18 @@ char const*const LCD_FILE
 
 char const*const BUTTON_FILE
         = "/sys/class/leds/button-backlight/brightness";
+
+char const*const RED_FILE
+        = "/sys/class/leds/red/brightness";
+
+char const*const GREEN_FILE
+        = "/sys/class/leds/green/brightness";
+
+char const*const BLUE_FILE
+        = "/sys/class/leds/blue/brightness";
+
+char const*const RED_BLINK_FILE
+        = "/sys/class/leds/red/blink";
 
 /**
  * device methods
@@ -67,6 +81,28 @@ write_int(char const* path, int value)
     if (fd >= 0) {
         char buffer[20];
         int bytes = sprintf(buffer, "%d\n", value);
+        int amt = write(fd, buffer, bytes);
+        close(fd);
+        return amt == -1 ? -errno : 0;
+    } else {
+        if (already_warned == 0) {
+            ALOGE("write_int failed to open %s\n", path);
+            already_warned = 1;
+        }
+        return -errno;
+    }
+}
+
+static int
+write_int_int(char const* path, int value1, int value2)
+{
+    int fd;
+    static int already_warned = 0;
+
+    fd = open(path, O_RDWR);
+    if (fd >= 0) {
+        char buffer[20];
+        int bytes = sprintf(buffer, "%d %d\n", value1, value2);
         int amt = write(fd, buffer, bytes);
         close(fd);
         return amt == -1 ? -errno : 0;
@@ -112,6 +148,71 @@ set_light_backlight(struct light_device_t* dev,
     g_lcd_brightness = brightness;
     pthread_mutex_unlock(&g_lock);
     return err;
+}
+
+static int
+set_speaker_light_locked(struct light_device_t* dev,
+        struct light_state_t const* state)
+{
+    int red, green, blue;
+    int onMS, offMS;
+
+    red = (state->color >> 16) & 0xFF;
+    green = (state->color >> 8) & 0xFF;
+    blue = (state->color) & 0xFF;
+
+    switch (state->flashMode) {
+        case LIGHT_FLASH_TIMED:
+        case LIGHT_FLASH_HARDWARE:
+            onMS = state->flashOnMS;
+            offMS = state->flashOffMS;
+            break;
+        case LIGHT_FLASH_NONE:
+        default:
+            onMS = 0;
+            offMS = 0;
+            break;
+    }
+
+    write_int(RED_FILE, red);
+    write_int(GREEN_FILE, green);
+    write_int(BLUE_FILE, blue);
+
+    write_int_int(RED_BLINK_FILE, onMS, offMS);
+
+    return 0;
+}
+
+static void
+handle_speaker_battery_locked(struct light_device_t* dev)
+{
+    if (is_lit(&g_battery)) {
+        set_speaker_light_locked(dev, &g_battery);
+    } else {
+        set_speaker_light_locked(dev, &g_notification);
+    }
+}
+
+static int
+set_light_battery(struct light_device_t* dev,
+        struct light_state_t const* state)
+{
+    pthread_mutex_lock(&g_lock);
+    g_battery = *state;
+    handle_speaker_battery_locked(dev);
+    pthread_mutex_unlock(&g_lock);
+    return 0;
+}
+
+static int
+set_light_notifications(struct light_device_t* dev,
+        struct light_state_t const* state)
+{
+    pthread_mutex_lock(&g_lock);
+    g_notification = *state;
+    handle_speaker_battery_locked(dev);
+    pthread_mutex_unlock(&g_lock);
+    return 0;
 }
 
 static int
@@ -161,8 +262,12 @@ static int open_lights(const struct hw_module_t* module, char const* name,
 
     if (0 == strcmp(LIGHT_ID_BACKLIGHT, name))
         set_light = set_light_backlight;
+    else if (0 == strcmp(LIGHT_ID_NOTIFICATIONS, name))
+        set_light = set_light_notifications;
     else if (0 == strcmp(LIGHT_ID_BUTTONS, name))
         set_light = set_light_buttons;
+    else if (0 == strcmp(LIGHT_ID_BATTERY, name))
+        set_light = set_light_battery;
     else
         return -EINVAL;
 

@@ -36,6 +36,34 @@
 
 #include "init_msm.h"
 
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+
+static void set_cmdline_properties()
+{
+    int i, rc;
+    char prop[PROP_VALUE_MAX];
+
+    struct {
+        const char *src_prop;
+        const char *dest_prop;
+        const char *def_val;
+    } prop_map[] = {
+        { "ro.boot.device", "ro.hw.device", "obake", },
+        { "ro.boot.hwrev", "ro.hw.hwrev", "0x8300", },
+        { "ro.boot.radio", "ro.hw.radio", "0x2", },
+    };
+
+    for (i = 0; i < ARRAY_SIZE(prop_map); i++) {
+        memset(prop, 0, PROP_VALUE_MAX);
+        rc = property_get(prop_map[i].src_prop, prop);
+        if (rc > 0) {
+            property_set(prop_map[i].dest_prop, prop);
+        } else {
+            property_set(prop_map[i].dest_prop, prop_map[i].def_val);
+        }
+    }
+}
+
 static void gsm_properties()
 {
     property_set("ro.telephony.default_network", "9");
@@ -86,6 +114,8 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
     if (!rc || !ISMATCH(platform, ANDROID_TARGET))
         return;
 
+    set_cmdline_properties();
+
     property_get("ro.boot.radio", radio);
     property_get("ro.boot.carrier", carrier);
     property_get("ro.boot.device", bootdevice);
@@ -109,8 +139,8 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
     }
 
     /* shared */
-    property_set("ro.build.description", "obake_verizon-user 4.4.4 SU5-24 24 release-keys");
-    property_set("ro.build.fingerprint", "motorola/obake_verizon/obake:4.4.4/SU5-24/24:user/release-keys");
+    property_set("ro.build.description", "obake_verizon-user 4.4.4 SU6-7.2 3 release-keys");
+    property_set("ro.build.fingerprint", "motorola/obake_verizon/obake:4.4.4/SU6-7.2/3:user/release-keys");
 
     /* fastboot oem config carrier switch */
     if (ISMATCH(carrier, "vzw")) {

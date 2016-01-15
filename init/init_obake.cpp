@@ -40,7 +40,8 @@
 
 static void set_cmdline_properties()
 {
-    int i, rc;
+    size_t i;
+    int rc;
     char prop[PROP_VALUE_MAX];
 
     struct {

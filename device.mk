@@ -15,7 +15,7 @@
 #
 
 # call the proprietary setup
-$(call inherit-product, vendor/motorola/obake/obake-vendor.mk)
+$(call inherit-product-if-exists, vendor/motorola/obake/obake-vendor.mk)
 
 LOCAL_PATH := device/motorola/obake
 

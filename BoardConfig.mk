@@ -24,6 +24,9 @@ LOCAL_PATH := device/motorola/obake
 # Assert
 TARGET_OTA_ASSERT_DEVICE := xt1030,obakem,obakem_verizon,xt1080,obake,obake_verizon,xt1080m,obake-maxx,obake-maxx_verizon
 
+# Kernel
+TARGET_KERNEL_CONFIG := cyanogenmod_obake_defconfig
+
 # Bluetooth includes
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
 

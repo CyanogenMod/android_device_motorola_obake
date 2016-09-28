@@ -140,8 +140,8 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
     }
 
     /* shared */
-    property_set("ro.build.description", "obake_verizon-user 4.4.4 SU6-7.2 3 release-keys");
-    property_set("ro.build.fingerprint", "motorola/obake_verizon/obake:4.4.4/SU6-7.2/3:user/release-keys");
+    property_set("ro.build.description", "obake_verizon-user 4.4.4 SU6-7.7 5 release-keys");
+    property_set("ro.build.fingerprint", "motorola/obake_verizon/obake:4.4.4/SU6-7.7/5:user/release-keys");
 
     /* fastboot oem config carrier switch */
     if (ISMATCH(carrier, "vzw")) {

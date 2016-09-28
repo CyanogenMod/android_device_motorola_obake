@@ -34,9 +34,8 @@
 #include "log.h"
 #include "util.h"
 
-#include "init_msm.h"
-
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+#define ISMATCH(a, b) (!strncmp((a), (b), PROP_VALUE_MAX))
 
 static void set_cmdline_properties()
 {
@@ -87,7 +86,7 @@ static void verizon_properties()
     property_set("ro.telephony.default_network", "10");
     property_set("telephony.lteOnCdmaDevice", "1");
     property_set("telephony.rilV7NeedCDMALTEPhone", "true");
-    
+
     property_set("ro.cdma.data_retry_config", "max_retries=infinite,0,0,10000,10000,100000,10000,10000,10000,10000,140000,540000,960000");
     property_set("ro.gsm.data_retry_config", "default_randomization=2000,max_retries=infinite,1000,1000,80000,125000,485000,905000");
     property_set("ro.gsm.2nd_data_retry_config", "max_retries=1,15000");
@@ -96,8 +95,7 @@ static void verizon_properties()
     property_set("ro.com.google.clientidbase.yt", "android-verizon");
 }
 
-void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
-        char *board_type)
+void vendor_load_properties()
 {
     char platform[PROP_VALUE_MAX];
     char radio[PROP_VALUE_MAX];
@@ -106,10 +104,6 @@ void init_msm_properties(unsigned long msm_id, unsigned long msm_ver,
     char bootdevice[PROP_VALUE_MAX];
     char devicename[PROP_VALUE_MAX];
     int rc;
-
-    UNUSED(msm_id);
-    UNUSED(msm_ver);
-    UNUSED(board_type);
 
     rc = property_get("ro.board.platform", platform);
     if (!rc || !ISMATCH(platform, ANDROID_TARGET))

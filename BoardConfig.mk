@@ -28,9 +28,9 @@ TARGET_OTA_ASSERT_DEVICE := xt1030,obakem,obakem_verizon,xt1080,obake,obake_veri
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(LOCAL_PATH)/bluetooth
 
 # Init
-TARGET_INIT_VENDOR_LIB := libinit_msm
-TARGET_LIBINIT_DEFINES_FILE := $(LOCAL_PATH)/init/init_obake.cpp
+TARGET_INIT_VENDOR_LIB := libinit_obake
 TARGET_NR_SVC_SUPP_GIDS := 28
+TARGET_RECOVERY_DEVICE_MODULES := libinit_obake
 TARGET_UNIFIED_DEVICE := true
 
 # Lights
